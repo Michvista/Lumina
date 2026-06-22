@@ -72,13 +72,13 @@ export default function AudioPlayer({
     setErrorMsg("");
 
     try {
-      console.log("[AUDIO-PLAYER] Play button clicked, requesting synthesis...");
+      console.log(
+        "[AUDIO-PLAYER] Play button clicked, requesting synthesis...",
+      );
       const result = await synthesizeSpeech(text, voice);
 
       if (result.useBrowserFallback || !result.audioObjectUrl) {
-        console.log(
-          "[AUDIO-PLAYER] Audio synthesis fell back to browser TTS"
-        );
+        console.log("[AUDIO-PLAYER] Audio synthesis fell back to browser TTS");
         speakWithBrowser(text);
         return;
       }
@@ -91,7 +91,7 @@ export default function AudioPlayer({
       audioRef.current = audio;
 
       console.log(
-        `[AUDIO-PLAYER] Audio element created, readyState=${audio.readyState}`
+        `[AUDIO-PLAYER] Audio element created, readyState=${audio.readyState}`,
       );
 
       audio.onplay = () => {
@@ -118,13 +118,13 @@ export default function AudioPlayer({
         const errorMsg = audio.error?.message ?? "Unknown error";
         console.error(
           `[AUDIO-PLAYER] Audio playback error: code=${errorCode}, message=${errorMsg}`,
-          e
+          e,
         );
         setErrorMsg(`Playback error: ${errorMsg}`);
         setState("error");
         setTimeout(() => speakWithBrowser(text), 500);
       };
-      
+
       audio.onloadstart = () => {
         console.log("[AUDIO-PLAYER] Audio loading started");
       };

@@ -84,8 +84,9 @@ export const synthesizeSpeech = async (
 
     // Backend returned a fallback JSON signal (content-type will be application/json)
     const contentType = String(response.headers["content-type"] ?? "");
+    const dataSize = (response.data as any).size || "unknown";
     console.log(
-      `[AUDIO-CLIENT] Response received: contentType=${contentType}, status=${response.status}, dataSize=${(response.data as any).size || "unknown"}`,
+      `[AUDIO-CLIENT] Response received: contentType=${contentType}, status=${response.status}, dataSize=${dataSize}`,
     );
     if (contentType.includes("application/json")) {
       console.log("[AUDIO-CLIENT] Received JSON fallback signal");
@@ -104,7 +105,9 @@ export const synthesizeSpeech = async (
 
     // Validation: empty blob is invalid
     if (audioBlob.size === 0) {
-      console.error("[AUDIO-CLIENT] ERROR: Blob is empty (0 bytes)");
+      console.error(
+        "[AUDIO-CLIENT] ERROR: Blob is empty (0 bytes). Backend audio synthesis failed.",
+      );
       return { audioObjectUrl: null, useBrowserFallback: true };
     }
 
@@ -116,6 +119,9 @@ export const synthesizeSpeech = async (
     return { audioObjectUrl, useBrowserFallback: false };
   } catch (error) {
     console.error("[AUDIO-CLIENT] Audio synthesis failed:", error);
+    if (error instanceof Error) {
+      console.error("[AUDIO-CLIENT] Error details:", error.message);
+    }
     return { audioObjectUrl: null, useBrowserFallback: true };
   }
 };

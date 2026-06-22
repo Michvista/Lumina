@@ -4,11 +4,24 @@
  */
 
 export type YarnGPTVoice =
-  | 'Idera' | 'Emma' | 'Zainab' | 'Osagie' | 'Wura' | 'Jude'
-  | 'Chinenye' | 'Tayo' | 'Regina' | 'Femi' | 'Adaora' | 'Umar'
-  | 'Mary' | 'Nonso' | 'Remi' | 'Adam';
+  | "Idera"
+  | "Emma"
+  | "Zainab"
+  | "Osagie"
+  | "Wura"
+  | "Jude"
+  | "Chinenye"
+  | "Tayo"
+  | "Regina"
+  | "Femi"
+  | "Adaora"
+  | "Umar"
+  | "Mary"
+  | "Nonso"
+  | "Remi"
+  | "Adam";
 
-export type YarnGPTFormat = 'mp3' | 'wav' | 'opus' | 'flac';
+export type YarnGPTFormat = "mp3" | "wav" | "opus" | "flac";
 
 export interface TTSResult {
   audioBuffer: Buffer | null;
@@ -17,7 +30,7 @@ export interface TTSResult {
   error?: string;
 }
 
-const YARNGPT_URL = 'https://yarngpt.ai/api/v1/tts';
+const YARNGPT_URL = "https://yarngpt.ai/api/v1/tts";
 
 /**
  * Call the YarnGPT API and return the audio buffer.
@@ -25,14 +38,18 @@ const YARNGPT_URL = 'https://yarngpt.ai/api/v1/tts';
  */
 export async function synthesizeSpeech(
   text: string,
-  voice: YarnGPTVoice = 'Idera',
-  format: YarnGPTFormat = 'mp3',
+  voice: YarnGPTVoice = "Idera",
+  format: YarnGPTFormat = "mp3",
 ): Promise<TTSResult> {
   const apiKey = process.env.YARNGPT_API_KEY;
 
   if (!apiKey) {
-    console.warn('[YarnGPT] No API key set — falling back to browser TTS');
-    return { audioBuffer: null, mimeType: 'audio/mpeg', useBrowserFallback: true };
+    console.warn("[YarnGPT] No API key set — falling back to browser TTS");
+    return {
+      audioBuffer: null,
+      mimeType: "audio/mpeg",
+      useBrowserFallback: true,
+    };
   }
 
   const controller = new AbortController();
@@ -40,10 +57,10 @@ export async function synthesizeSpeech(
 
   try {
     const response = await fetch(YARNGPT_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         text: text.slice(0, 2000), // API max
@@ -56,23 +73,28 @@ export async function synthesizeSpeech(
     clearTimeout(timeout);
 
     if (!response.ok) {
-      const errText = await response.text().catch(() => '');
+      const errText = await response.text().catch(() => "");
       console.error(`[YarnGPT] API error ${response.status}: ${errText}`);
-      return { audioBuffer: null, mimeType: 'audio/mpeg', useBrowserFallback: true, error: errText };
+      return {
+        audioBuffer: null,
+        mimeType: "audio/mpeg",
+        useBrowserFallback: true,
+        error: errText,
+      };
     }
 
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = Buffer.from(arrayBuffer);
 
     console.log(
-      `[YarnGPT] Successfully received audio: ${audioBuffer.length} bytes, format=${format}`
+      `[YarnGPT] Successfully received audio: ${audioBuffer.length} bytes, format=${format}`,
     );
 
     const mimeTypes: Record<YarnGPTFormat, string> = {
-      mp3:  'audio/mpeg',
-      wav:  'audio/wav',
-      opus: 'audio/ogg; codecs=opus',
-      flac: 'audio/flac',
+      mp3: "audio/mpeg",
+      wav: "audio/wav",
+      opus: "audio/ogg; codecs=opus",
+      flac: "audio/flac",
     };
 
     return {
@@ -82,13 +104,21 @@ export async function synthesizeSpeech(
     };
   } catch (err: any) {
     clearTimeout(timeout);
-    let msg = err instanceof Error ? err.message : 'Unknown error';
-    
-    if (err.name === 'AbortError' || msg.includes('aborted')) {
-      msg = 'The request timed out after 90 seconds (YarnGPT took too long to generate the speech).';
+    let msg = err instanceof Error ? err.message : "Unknown error";
+
+    if (err.name === "AbortError" || msg.includes("aborted")) {
+      msg =
+        "The request timed out after 90 seconds (YarnGPT took too long to generate the speech).";
     }
-    
-    console.warn(`[YarnGPT] Request failed: ${msg}. Browser TTS fallback active.`);
-    return { audioBuffer: null, mimeType: 'audio/mpeg', useBrowserFallback: true, error: msg };
+
+    console.warn(
+      `[YarnGPT] Request failed: ${msg}. Browser TTS fallback active.`,
+    );
+    return {
+      audioBuffer: null,
+      mimeType: "audio/mpeg",
+      useBrowserFallback: true,
+      error: msg,
+    };
   }
 }

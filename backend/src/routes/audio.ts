@@ -26,6 +26,17 @@ export const audioRouter = Router();
  * In both modes, if YarnGPT is unavailable, returns { useBrowserFallback: true }
  * so the client falls back to window.speechSynthesis — this behavior is untouched.
  */
+
+// Handle CORS preflight
+audioRouter.options("/synthesize", (_req, res) => {
+  res.set({
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  });
+  res.sendStatus(200);
+});
+
 audioRouter.post(
   "/synthesize",
   asyncHandler(async (req: Request, res: Response) => {
@@ -81,9 +92,7 @@ audioRouter.post(
       "Content-Type": result.mimeType,
       "Content-Length": result.audioBuffer.length,
       "Cache-Control": "public, max-age=3600",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Accept-Ranges": "bytes",
     });
     res.send(result.audioBuffer);
   }),
