@@ -266,7 +266,7 @@ export default function Results() {
             </div>
 
             {/* Markers List */}
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-[520px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#F4DFD7] scrollbar-track-transparent">
               {report.markers.map((m) => {
                 const isSelected = selectedMarker?.id === m.id;
                 const isOutOfRange = m.status !== 'NORMAL' && m.status !== 'UNKNOWN';

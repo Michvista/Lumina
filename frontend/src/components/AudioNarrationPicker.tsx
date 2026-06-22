@@ -43,12 +43,15 @@ export default function AudioNarrationPicker({ reportId }: AudioNarrationPickerP
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Stop audio if reportId changes
+  // Stop audio if reportId changes or on unmount
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      window.speechSynthesis.cancel();
       setIsPlaying(false);
-    }
+    };
   }, [reportId]);
 
   async function handlePlay() {
@@ -56,6 +59,7 @@ export default function AudioNarrationPicker({ reportId }: AudioNarrationPickerP
       if (audioRef.current) {
         audioRef.current.pause();
       }
+      window.speechSynthesis.cancel();
       setIsPlaying(false);
       return;
     }

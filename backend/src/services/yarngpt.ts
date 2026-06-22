@@ -36,7 +36,7 @@ export async function synthesizeSpeech(
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15_000); // 15s timeout
+  const timeout = setTimeout(() => controller.abort(), 90_000); // 90s timeout
 
   try {
     const response = await fetch(YARNGPT_URL, {
@@ -76,9 +76,14 @@ export async function synthesizeSpeech(
       mimeType: mimeTypes[format],
       useBrowserFallback: false,
     };
-  } catch (err) {
+  } catch (err: any) {
     clearTimeout(timeout);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
+    let msg = err instanceof Error ? err.message : 'Unknown error';
+    
+    if (err.name === 'AbortError' || msg.includes('aborted')) {
+      msg = 'The request timed out after 90 seconds (YarnGPT took too long to generate the speech).';
+    }
+    
     console.warn(`[YarnGPT] Request failed: ${msg}. Browser TTS fallback active.`);
     return { audioBuffer: null, mimeType: 'audio/mpeg', useBrowserFallback: true, error: msg };
   }
