@@ -75,6 +75,7 @@ export const synthesizeSpeech = async (
   voice = "Idera",
 ): Promise<{ audioObjectUrl: string | null; useBrowserFallback: boolean }> => {
   try {
+    console.log("[AUDIO-CLIENT] Requesting audio synthesis...");
     const response = await api.post(
       "/audio/synthesize",
       { text, voice, format: "mp3" },
@@ -83,7 +84,11 @@ export const synthesizeSpeech = async (
 
     // Backend returned a fallback JSON signal (content-type will be application/json)
     const contentType = String(response.headers["content-type"] ?? "");
+    console.log(
+      `[AUDIO-CLIENT] Response received: contentType=${contentType}, status=${response.status}, dataSize=${(response.data as any).size || "unknown"}`,
+    );
     if (contentType.includes("application/json")) {
+      console.log("[AUDIO-CLIENT] Received JSON fallback signal");
       return { audioObjectUrl: null, useBrowserFallback: true };
     }
 
@@ -93,11 +98,24 @@ export const synthesizeSpeech = async (
         ? response.data
         : new Blob([response.data as BlobPart], { type: "audio/mpeg" });
 
+    console.log(
+      `[AUDIO-CLIENT] Blob created: size=${audioBlob.size} bytes, type=${audioBlob.type}`,
+    );
+
+    // Validation: empty blob is invalid
+    if (audioBlob.size === 0) {
+      console.error("[AUDIO-CLIENT] ERROR: Blob is empty (0 bytes)");
+      return { audioObjectUrl: null, useBrowserFallback: true };
+    }
+
     // Create object URL for the audio element
     const audioObjectUrl = URL.createObjectURL(audioBlob);
+    console.log(
+      `[AUDIO-CLIENT] Object URL created: ${audioObjectUrl.substring(0, 50)}...`,
+    );
     return { audioObjectUrl, useBrowserFallback: false };
   } catch (error) {
-    console.error("Audio synthesis failed:", error);
+    console.error("[AUDIO-CLIENT] Audio synthesis failed:", error);
     return { audioObjectUrl: null, useBrowserFallback: true };
   }
 };

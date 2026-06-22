@@ -64,6 +64,10 @@ export async function synthesizeSpeech(
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = Buffer.from(arrayBuffer);
 
+    console.log(
+      `[YarnGPT] Successfully received audio: ${audioBuffer.length} bytes, format=${format}`
+    );
+
     const mimeTypes: Record<YarnGPTFormat, string> = {
       mp3:  'audio/mpeg',
       wav:  'audio/wav',

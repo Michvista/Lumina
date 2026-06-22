@@ -66,11 +66,17 @@ audioRouter.post(
 
     // Fallback signal — client will use browser TTS. Untouched.
     if (result.useBrowserFallback || !result.audioBuffer) {
+      console.log(
+        `[AUDIO] Fallback triggered: useBrowserFallback=${result.useBrowserFallback}, hasBuffer=${!!result.audioBuffer}`,
+      );
       res.json({ useBrowserFallback: true, narrationText });
       return;
     }
 
     // Stream binary audio back directly with proper headers for production.
+    console.log(
+      `[AUDIO] Sending audio buffer: size=${result.audioBuffer.length} bytes, type=${result.mimeType}`,
+    );
     res.set({
       "Content-Type": result.mimeType,
       "Content-Length": result.audioBuffer.length,

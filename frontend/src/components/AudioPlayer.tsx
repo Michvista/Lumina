@@ -19,6 +19,7 @@ export default function AudioPlayer({
 }: AudioPlayerProps) {
   const [state, setState] = useState<PlayerState>("idle");
   const [usedFallback, setUsedFallback] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
 
@@ -68,12 +69,16 @@ export default function AudioPlayer({
     }
 
     setState("loading");
+    setErrorMsg("");
 
     try {
+      console.log("[AUDIO-PLAYER] Play button clicked, requesting synthesis...");
       const result = await synthesizeSpeech(text, voice);
 
       if (result.useBrowserFallback || !result.audioObjectUrl) {
-        console.log("Audio synthesis fell back to browser TTS");
+        console.log(
+          "[AUDIO-PLAYER] Audio synthesis fell back to browser TTS"
+        );
         speakWithBrowser(text);
         return;
       }
@@ -85,24 +90,64 @@ export default function AudioPlayer({
       const audio = new Audio(result.audioObjectUrl);
       audioRef.current = audio;
 
-      audio.onplay = () => setState("playing");
-      audio.onpause = () => {
-        if (audio.ended) setState("idle");
-        else setState("paused");
+      console.log(
+        `[AUDIO-PLAYER] Audio element created, readyState=${audio.readyState}`
+      );
+
+      audio.onplay = () => {
+        console.log("[AUDIO-PLAYER] Audio started playing");
+        setState("playing");
+        setErrorMsg("");
       };
-      audio.onended = () => setState("idle");
+      audio.onpause = () => {
+        if (audio.ended) {
+          console.log("[AUDIO-PLAYER] Audio ended");
+          setState("idle");
+        } else {
+          console.log("[AUDIO-PLAYER] Audio paused");
+          setState("paused");
+        }
+      };
+      audio.onended = () => {
+        console.log("[AUDIO-PLAYER] Audio finished");
+        setState("idle");
+        setErrorMsg("");
+      };
       audio.onerror = (e) => {
-        console.error("Audio playback error:", e);
-        speakWithBrowser(text);
+        const errorCode = audio.error?.code ?? "UNKNOWN";
+        const errorMsg = audio.error?.message ?? "Unknown error";
+        console.error(
+          `[AUDIO-PLAYER] Audio playback error: code=${errorCode}, message=${errorMsg}`,
+          e
+        );
+        setErrorMsg(`Playback error: ${errorMsg}`);
+        setState("error");
+        setTimeout(() => speakWithBrowser(text), 500);
+      };
+      
+      audio.onloadstart = () => {
+        console.log("[AUDIO-PLAYER] Audio loading started");
+      };
+      audio.oncanplay = () => {
+        console.log("[AUDIO-PLAYER] Audio can play");
+      };
+      audio.onloadeddata = () => {
+        console.log("[AUDIO-PLAYER] Audio data loaded");
       };
 
+      console.log("[AUDIO-PLAYER] Calling audio.play()...");
       audio.play().catch((err) => {
-        console.error("Audio play() failed:", err);
+        console.error("[AUDIO-PLAYER] audio.play() failed:", err);
+        setErrorMsg(`Play error: ${err.message}`);
+        setState("error");
         speakWithBrowser(text);
       });
     } catch (err) {
-      console.error("Audio synthesis error:", err);
-      speakWithBrowser(text);
+      const errMsg = err instanceof Error ? err.message : "Unknown error";
+      console.error("[AUDIO-PLAYER] Audio synthesis error:", err);
+      setErrorMsg(`Synthesis error: ${errMsg}`);
+      setState("error");
+      setTimeout(() => speakWithBrowser(text), 500);
     }
   };
 
@@ -111,6 +156,7 @@ export default function AudioPlayer({
     if (audioRef.current) audioRef.current.currentTime = 0;
     window.speechSynthesis.cancel();
     setState("idle");
+    setErrorMsg("");
   };
 
   const isActive = state === "playing" || state === "paused";
@@ -133,11 +179,15 @@ export default function AudioPlayer({
         <div className="flex flex-col">
           <span className="text-xs font-semibold text-[#5D3754]">{label}</span>
           <span className="text-[10px] text-[#5D3754]/60">
-            {isActive
-              ? usedFallback
-                ? "Browser Voice"
-                : `AI Voice · ${voice}`
-              : "Listen to empathetic audio summary"}
+            {state === "error"
+              ? `Error: ${errorMsg}`
+              : isActive
+                ? usedFallback
+                  ? "Browser Voice"
+                  : `AI Voice · ${voice}`
+                : state === "loading"
+                  ? "Loading audio..."
+                  : "Listen to empathetic audio summary"}
           </span>
         </div>
       </div>
