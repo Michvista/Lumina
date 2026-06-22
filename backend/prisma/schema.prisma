@@ -77,7 +77,7 @@ model Marker {
   name         String  // Normalized name e.g. "TSH", "AMH", "LH"
   displayName  String  // Human-friendly name e.g. "Thyroid Stimulating Hormone"
   value        Float
-  unit         String  // e.g. "mIU/L", "ng/mL"
+  unit String?  // e.g. "mIU/L", "ng/mL"
 
   // Reference ranges (from the lab report)
   refLow       Float?

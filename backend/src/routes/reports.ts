@@ -57,7 +57,7 @@ reportRouter.post(
     };
 
     if (!sessionId) { res.status(400).json({ error: 'sessionId required' }); return; }
-    if (!req.file)  { res.status(400).json({ error: 'No file uploaded' }); return; }
+    if (!req.file) { res.status(400).json({ error: 'No file uploaded' }); return; }
 
     // 1. Get or create user
     const user = await prisma.user.upsert({
@@ -144,7 +144,7 @@ async function processReport(
       name: m.name,
       previousValue: m.value,
       previousDate: m.report.createdAt.toISOString().split('T')[0],
-      unit: m.unit,
+      unit: m.unit ?? null,
     }));
 
     // Step 4: Get the stored report for cycle info
@@ -171,7 +171,7 @@ async function processReport(
         name: m.name,
         displayName: m.displayName,
         value: m.value,
-        unit: m.unit,
+        unit: m.unit ?? null,
         refLow: m.refLow ?? null,
         refHigh: m.refHigh ?? null,
         refLabel: m.refLabel ?? null,
