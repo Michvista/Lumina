@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Volume2, VolumeX, Play, Pause, Loader2 } from 'lucide-react';
-import { synthesizeSpeech } from '../lib/api';
+import { useState, useRef, useEffect } from "react";
+import { Volume2, VolumeX, Play, Pause, Loader2 } from "lucide-react";
+import { synthesizeSpeech } from "../lib/api";
 
-const DEFAULT_VOICE = 'Idera';
+const DEFAULT_VOICE = "Idera";
 
 interface AudioPlayerProps {
   text: string;
@@ -10,14 +10,14 @@ interface AudioPlayerProps {
   voice?: string;
 }
 
-type PlayerState = 'idle' | 'loading' | 'playing' | 'paused' | 'error';
+type PlayerState = "idle" | "loading" | "playing" | "paused" | "error";
 
 export default function AudioPlayer({
   text,
-  label = 'Listen to summary',
+  label = "Listen to summary",
   voice = DEFAULT_VOICE,
 }: AudioPlayerProps) {
-  const [state, setState] = useState<PlayerState>('idle');
+  const [state, setState] = useState<PlayerState>("idle");
   const [usedFallback, setUsedFallback] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -37,40 +37,43 @@ export default function AudioPlayer({
     utt.rate = 0.92;
     utt.pitch = 1.05;
     const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      v.lang.startsWith('en') &&
-      (v.name.toLowerCase().includes('female') ||
-       v.name.toLowerCase().includes('samantha') ||
-       v.name.toLowerCase().includes('karen') ||
-       v.name.toLowerCase().includes('victoria'))
-    ) ?? voices.find(v => v.lang.startsWith('en'));
+    const preferred =
+      voices.find(
+        (v) =>
+          v.lang.startsWith("en") &&
+          (v.name.toLowerCase().includes("female") ||
+            v.name.toLowerCase().includes("samantha") ||
+            v.name.toLowerCase().includes("karen") ||
+            v.name.toLowerCase().includes("victoria")),
+      ) ?? voices.find((v) => v.lang.startsWith("en"));
     if (preferred) utt.voice = preferred;
-    utt.onstart = () => setState('playing');
-    utt.onend   = () => setState('idle');
-    utt.onerror = () => setState('error');
+    utt.onstart = () => setState("playing");
+    utt.onend = () => setState("idle");
+    utt.onerror = () => setState("error");
     window.speechSynthesis.speak(utt);
   };
 
   const handlePlay = async () => {
-    if (state === 'playing') {
+    if (state === "playing") {
       if (usedFallback) window.speechSynthesis.pause();
       else audioRef.current?.pause();
-      setState('paused');
+      setState("paused");
       return;
     }
-    if (state === 'paused') {
+    if (state === "paused") {
       if (usedFallback) window.speechSynthesis.resume();
       else audioRef.current?.play();
-      setState('playing');
+      setState("playing");
       return;
     }
 
-    setState('loading');
+    setState("loading");
 
     try {
       const result = await synthesizeSpeech(text, voice);
 
       if (result.useBrowserFallback || !result.audioObjectUrl) {
+        console.log("Audio synthesis fell back to browser TTS");
         speakWithBrowser(text);
         return;
       }
@@ -82,16 +85,23 @@ export default function AudioPlayer({
       const audio = new Audio(result.audioObjectUrl);
       audioRef.current = audio;
 
-      audio.onplay  = () => setState('playing');
+      audio.onplay = () => setState("playing");
       audio.onpause = () => {
-        if (audio.ended) setState('idle');
-        else setState('paused');
+        if (audio.ended) setState("idle");
+        else setState("paused");
       };
-      audio.onended = () => setState('idle');
-      audio.onerror = () => speakWithBrowser(text);
+      audio.onended = () => setState("idle");
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e);
+        speakWithBrowser(text);
+      };
 
-      audio.play();
-    } catch {
+      audio.play().catch((err) => {
+        console.error("Audio play() failed:", err);
+        speakWithBrowser(text);
+      });
+    } catch (err) {
+      console.error("Audio synthesis error:", err);
       speakWithBrowser(text);
     }
   };
@@ -100,28 +110,34 @@ export default function AudioPlayer({
     audioRef.current?.pause();
     if (audioRef.current) audioRef.current.currentTime = 0;
     window.speechSynthesis.cancel();
-    setState('idle');
+    setState("idle");
   };
 
-  const isActive = state === 'playing' || state === 'paused';
+  const isActive = state === "playing" || state === "paused";
 
   return (
-    <div className={`flex items-center justify-between gap-4 p-4 rounded-2xl border transition-all duration-300 ${
-      isActive 
-        ? 'bg-[#FAF6F2]/90 border-[#8FA998]/50 shadow-sm' 
-        : 'bg-[#FAF6F2]/30 border-[#F4DFD7]/70'
-    }`}>
+    <div
+      className={`flex items-center justify-between gap-4 p-4 rounded-2xl border transition-all duration-300 ${
+        isActive
+          ? "bg-[#FAF6F2]/90 border-[#8FA998]/50 shadow-sm"
+          : "bg-[#FAF6F2]/30 border-[#F4DFD7]/70"
+      }`}>
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[#5D3754] ${
-          isActive ? 'bg-[#8FA998]/20 animate-pulse' : 'bg-[#FAF6F2]'
-        }`}>
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-[#5D3754] ${
+            isActive ? "bg-[#8FA998]/20 animate-pulse" : "bg-[#FAF6F2]"
+          }`}>
           <Volume2 size={15} />
         </div>
 
         <div className="flex flex-col">
           <span className="text-xs font-semibold text-[#5D3754]">{label}</span>
           <span className="text-[10px] text-[#5D3754]/60">
-            {isActive ? (usedFallback ? 'Browser Voice' : `AI Voice · ${voice}`) : 'Listen to empathetic audio summary'}
+            {isActive
+              ? usedFallback
+                ? "Browser Voice"
+                : `AI Voice · ${voice}`
+              : "Listen to empathetic audio summary"}
           </span>
         </div>
       </div>
@@ -129,20 +145,19 @@ export default function AudioPlayer({
       <div className="flex items-center gap-2">
         <button
           onClick={handlePlay}
-          disabled={state === 'loading' || state === 'error'}
-          className="bg-[#5D3754] hover:bg-[#4C2C44] disabled:opacity-50 text-[#FAF6F2] font-semibold text-xs px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5"
-        >
-          {state === 'loading' ? (
+          disabled={state === "loading" || state === "error"}
+          className="bg-[#5D3754] hover:bg-[#4C2C44] disabled:opacity-50 text-[#FAF6F2] font-semibold text-xs px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5">
+          {state === "loading" ? (
             <>
               <Loader2 size={12} className="animate-spin" />
               Loading...
             </>
-          ) : state === 'playing' ? (
+          ) : state === "playing" ? (
             <>
               <Pause size={12} />
               Pause
             </>
-          ) : state === 'paused' ? (
+          ) : state === "paused" ? (
             <>
               <Play size={12} />
               Resume
@@ -156,11 +171,10 @@ export default function AudioPlayer({
         </button>
 
         {isActive && (
-          <button 
-            onClick={handleStop} 
+          <button
+            onClick={handleStop}
             className="w-8 h-8 rounded-full hover:bg-[#FAF6F2] text-[#5D3754]/80 hover:text-[#5D3754] flex items-center justify-center transition-colors"
-            title="Stop playing"
-          >
+            title="Stop playing">
             <VolumeX size={14} />
           </button>
         )}
