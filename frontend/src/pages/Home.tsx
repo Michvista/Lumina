@@ -4,14 +4,14 @@ import { Shield, Sparkles, Upload, FileText, Check } from 'lucide-react';
 export default function Home() {
   return (
     <div className="bg-[#FAF6F2] min-h-screen text-[#2A1A24] selection:bg-[#F4DFD7] selection:text-[#5D3754]">
-      
+
       {/* ── HERO SECTION ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
+
           {/* Left Text Column */}
           <div className="lg:col-span-7 flex flex-col items-start space-y-6 md:space-y-8 animate-fade-up">
-            
+
             {/* Trusted Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F4DFD7] text-[#5D3754] text-xs font-semibold tracking-wider uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[#5D3754] animate-ping" />
@@ -61,7 +61,7 @@ export default function Home() {
                 alt="Woman reviewing health insights"
                 className="w-full h-full object-cover"
               />
-              
+
               {/* Overlay card: Insight Generated */}
               <div className="absolute bottom-6 left-6 right-6 bg-[#FDFBFA]/95 backdrop-blur border border-[#F4DFD7] rounded-2xl p-4 shadow-xl flex items-start gap-3.5 animate-scale-up anim-delay-4">
                 <div className="w-10 h-10 rounded-xl bg-[#8FA998]/15 flex items-center justify-center text-[#8FA998] shrink-0">
@@ -87,7 +87,7 @@ export default function Home() {
       {/* ── SECTION: EMPATHETIC CLARITY ─────────────────────────── */}
       <section className="bg-white border-y border-[#F4DFD7]/50 py-16 md:py-24 px-4 md:px-6 relative" id="how-it-works">
         <div className="max-w-7xl mx-auto">
-          
+
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
             <span className="text-[#8FA998] font-bold text-xs uppercase tracking-wider block">Empathetic Clarity, Not Cold Data</span>
@@ -101,7 +101,7 @@ export default function Home() {
 
           {/* Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-            
+
             {/* Card 1: The Don't Panic Protocol */}
             <div className="col-span-1 md:col-span-8 bg-[#FAF6F2] border border-[#F4DFD7]/80 rounded-[28px] p-7 md:p-8 flex flex-col justify-between hover:shadow-lg transition-shadow duration-300">
               <div className="space-y-4">
@@ -132,7 +132,7 @@ export default function Home() {
               <div className="space-y-5">
                 <span className="text-xs font-bold text-[#8FA998] uppercase tracking-wider block">Doctor Preparation</span>
                 <h3 className="font-serif text-3xl font-semibold">Your Appointment Questions</h3>
-                
+
                 {/* Speech bubbles */}
                 <div className="space-y-3 font-sans">
                   <div className="bg-white/10 rounded-2xl rounded-tl-none p-3.5 text-xs text-white/95 leading-relaxed">
@@ -194,14 +194,14 @@ export default function Home() {
       {/* ── SECTION: PRICING ────────────────────────────────────── */}
       <section className="py-24 px-6" id="pricing">
         <div className="max-w-5xl mx-auto">
-          
+
           <div className="text-center max-w-xl mx-auto mb-16 space-y-3">
             <h2 className="font-serif text-4xl md:text-5xl font-semibold text-[#5D3754]">Clarity that fits your journey</h2>
             <p className="text-sm text-[#5D3754]/80">Explore simple pricing plans built with clear, empathetic guidance.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            
+
             {/* Single Use Card */}
             <div className="bg-white border border-[#F4DFD7] rounded-3xl p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
               <div className="space-y-6">
@@ -210,10 +210,10 @@ export default function Home() {
                   <h3 className="font-serif text-2xl font-semibold text-[#5D3754]">On-Demand Report</h3>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-serif font-bold text-[#5D3754]">₦20,000</span>
+                  <span className="text-3xl font-serif font-bold text-[#5D3754]">₦200</span>
                   <span className="text-sm text-[#5D3754]/75">/ report (First 3 Free)</span>
                 </div>
-                
+
                 <div className="border-t border-[#F4DFD7]/40 my-4" />
 
                 <ul className="space-y-3.5 text-sm text-[#5D3754]/85">
@@ -239,7 +239,7 @@ export default function Home() {
 
             {/* Annual Pass Card */}
             <div className="bg-[#5D3754] text-white border border-[#5D3754] rounded-3xl p-8 flex flex-col justify-between shadow-xl relative overflow-hidden hover:shadow-2xl transition-all duration-300">
-              
+
               {/* Highlight badge */}
               <div className="absolute top-4 right-4 bg-[#8FA998] text-[#2E4A3F] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                 Best Value
@@ -251,7 +251,7 @@ export default function Home() {
                   <h3 className="font-serif text-2xl font-semibold">Continuous Care</h3>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-serif font-bold">₦49,000</span>
+                  <span className="text-3xl font-serif font-bold">₦5000</span>
                   <span className="text-sm text-white/75">/ year</span>
                 </div>
 
@@ -286,7 +286,7 @@ export default function Home() {
       <section className="pb-24 px-6">
         <div className="max-w-5xl mx-auto bg-[#F4DFD7] rounded-[40px] p-8 md:p-16 text-center space-y-6 shadow-sm relative overflow-hidden">
           <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#8FA998]/10 rounded-full blur-xl" />
-          
+
           <h2 className="font-serif text-4xl md:text-5xl font-semibold text-[#5D3754] max-w-xl mx-auto leading-[1.1]">
             Your health history has a story. Let's read it together.
           </h2>
