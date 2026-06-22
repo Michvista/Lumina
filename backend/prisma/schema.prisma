@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+// Guest-mode friendly: no auth required for hackathon.
+// sessionId is a UUID stored in localStorage on the client.
+model User {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  email     String?  @unique
+  password  String?  // Hashed password
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reports Report[]
+
+  @@map("users")
+}
+
+// ─── Report ──────────────────────────────────────────────────────────────────
+// One upload = one report. Stores the raw file URL and the full AI output.
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fileUrl   String   // Cloudinary URL
+  fileName  String   // Original file name
+  fileType  String   // "pdf" | "image"
+
+  // Phase-aware context
+  cycleDay  Int?     // Day of cycle when blood was drawn (null = N/A)
+  cyclePhase String? // "follicular" | "ovulatory" | "luteal" | "menstrual" | "not_applicable" | "menopausal" | "unknown"
+
+  // Raw AI outputs stored as JSON strings
+  rawExtraction  String? @db.Text // Raw Gemini extraction JSON
+  explanation    String? @db.Text // Groq plain-language explanation (JSON)
+  advocacyChecklist String? @db.Text // Groq-generated questions list (JSON)
+
+  status    ReportStatus @default(PENDING)
+  error     String?      @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  markers Marker[]
+  translations Translation[]
+
+  @@map("reports")
+}
+
+enum ReportStatus {
+  PENDING
+  EXTRACTING
+  ANALYZING
+  COMPLETE
+  FAILED
+}
+
+// ─── Marker ──────────────────────────────────────────────────────────────────
+// One row per lab marker per report.
+// This table is what enables longitudinal memory and trend charts.
+model Marker {
+  id           String  @id @default(cuid())
+  reportId     String
+  report       Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  name         String  // Normalized name e.g. "TSH", "AMH", "LH"
+  displayName  String  // Human-friendly name e.g. "Thyroid Stimulating Hormone"
+  value        Float
+  unit         String  // e.g. "mIU/L", "ng/mL"
+
+  // Reference ranges (from the lab report)
+  refLow       Float?
+  refHigh      Float?
+  refLabel     String? // e.g. "Normal", "Low", "High", "Critical"
+
+  // AI-computed status
+  status       MarkerStatus @default(NORMAL)
+
+  // Plain-language explanation for this specific marker
+  plainExplanation String? @db.Text
+  trendNote        String? @db.Text // Populated if historical data exists
+
+  createdAt    DateTime @default(now())
+
+  @@index([reportId])
+  @@index([name])       // Fast lookups for trend queries
+  @@map("markers")
+}
+
+enum MarkerStatus {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL_LOW
+  CRITICAL_HIGH
+  UNKNOWN
+}
+
+
+enum SupportedLanguage {
+  ENGLISH
+  PIDGIN
+  YORUBA
+  IGBO
+  HAUSA
+}
+
+model Translation {
+  id        String            @id @default(cuid())
+  reportId  String
+  report    Report            @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  language  SupportedLanguage
+  text      String            @db.Text
+  createdAt DateTime          @default(now())
+
+  @@unique([reportId, language])
+  @@map("translations")
+}
