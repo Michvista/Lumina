@@ -1,0 +1,9 @@
+Lumina tech stack summary:
+
+- Frontend: React + Vite + TypeScript
+- Styling: Tailwind CSS
+- Routing/UI: React Router + Recharts for charts
+- Backend: Node.js + Express + TypeScript
+- Database: PostgreSQL with Prisma ORM
+- AI / integration: Google Gemini, Groq SDK, Cloudinary, YarnGPT TTS/browser speechSynthesis
+- Deployment targets: Vercel for frontend, backend ready for cloud hosting (Render or equivalent)

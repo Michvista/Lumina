@@ -34,6 +34,7 @@ Core features:
 ## Demo
 
 - Live Demo: https://lumina-frontend-one.vercel.app
+- Demo Video: https://drive.google.com/file/d/1hO-z2ALSOTIRAyJzzA61QpJNGQaZEJPN/view?usp=drivesdk
 
 ## Screenshots
 
@@ -41,8 +42,8 @@ Add screenshots or GIFs of your product here.
 
 | Screen | Description |
 |---|---|
-| ![Screenshot 1](./assets/screenshot-1.png) | Upload and report interpretation screen |
-| ![Screenshot 2](./assets/screenshot-2.png) | Trend chart and advocacy checklist |
+| ![Report page](./assets/reportpage.png) | Upload and report interpretation screen |
+| ![More report page](./assets/morereportpage.png) | Trend chart and advocacy checklist |
 
 ## How It Works
 

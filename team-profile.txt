@@ -1,0 +1,9 @@
+Team profile:
+
+- Team Name: Veritas
+- Focus: Health track hackathon project helping women understand lab results and clinical reports.
+- Members:
+  - Olumide Michelle Oluwanifemi — Developer
+  - Adedunye Imisioluwa Praise — Web Developer
+  - Ewelike Virginia Oluchi — Researcher
+- Strengths: frontend UI, backend AI integration, medical research and user validation.
