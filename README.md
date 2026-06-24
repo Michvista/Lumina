@@ -1,47 +1,107 @@
-# Lumina — The Women's Health Decoder
+# Veritas — Lumina
 
-> Stop Googling your lab results. Understand your body, prep for your doctor.
+> One-line summary: Lumina helps women understand lab results, decode clinical reports, and prepare for conversations with doctors.
 
-## Stack
+## HER Hackathon Track
 
-| Layer    | Tech                                        |
-|----------|---------------------------------------------|
-| Frontend | Vite + React + TypeScript                   |
-| Backend  | Node + Express + TypeScript                 |
-| Database | PostgreSQL + Prisma ORM                     |
-| AI (OCR) | Google Gemini 1.5 Flash (vision extraction) |
-| AI (NLP) | Groq — Llama 3.3 70B (empathetic analysis) |
-| Storage  | Cloudinary (PDF + image hosting)            |
-| TTS      | YarnGPT (Gradio Space) + browser fallback   |
+- Track: Health
+- Team Name: Veritas
+- Team Members:
+  - Olumide Michelle Oluwanifemi — Developer
+  - Adedunye Imisioluwa Praise — Web Developer
+  - Ewelike Virginia Oluchi — Researcher
 
-## Features
+## Problem Statement
 
-- **"Don't Panic" Protocol** — context-aware, empathetic explanations per marker
-- **Phase-Aware Analysis** — asks cycle day before analysis to prevent misinterpretations
-- **Longitudinal Memory** — tracks markers across reports, spots trends (e.g. TSH creeping up)
-- **ConsentClear Advocacy** — generates personalised doctor question checklists
-- **Audio readout** — YarnGPT TTS with browser `speechSynthesis` fallback
+Women often struggle to interpret their lab reports because medical results are written in technical language and lack personalized context. This leads to confusion, anxiety, and missed opportunities to act on health signals.
 
-## Getting Started
+Evidence from validation:
 
-### 1. Prerequisites
+- Early feedback showed users felt lost reading numerical lab values without plain-language explanations.
+- Users wanted a trusted way to convert report findings into doctor questions and actionable summaries.
+- People preferred a mobile-friendly, accessible experience with both visual and audio guidance.
 
-- Node.js 18+
-- PostgreSQL running locally (or a hosted Postgres URL)
-- API keys: Gemini, Groq, Cloudinary
+## Solution Overview
 
-### 2. Environment setup
+Lumina transforms lab result PDFs into easy-to-understand health explanations, trend analysis, and personalized doctor advocacy checklists. It also provides audio narration so users can absorb insights hands-free.
 
-```bash
-# Backend
-cp backend/.env.example backend/.env
-# Fill in your keys in backend/.env
+Core features:
 
-# Frontend
-cp frontend/.env.example frontend/.env
+1. PDF report upload with OCR extraction and structured marker parsing
+2. Medical result decoding plus trend chart analysis across reports
+3. Personalized doctor question checklist and audio summary playback
+
+## Demo
+
+- Live Demo: https://lumina-frontend-one.vercel.app
+
+## Screenshots
+
+Add screenshots or GIFs of your product here.
+
+| Screen | Description |
+|---|---|
+| ![Screenshot 1](./assets/screenshot-1.png) | Upload and report interpretation screen |
+| ![Screenshot 2](./assets/screenshot-2.png) | Trend chart and advocacy checklist |
+
+## How It Works
+
+1. The user uploads a lab report PDF or image.
+2. The backend extracts markers with Google Gemini and analyzes them with Groq.
+3. The app shows simplified explanations, trends, and audio narration.
+
+## Validation & Research
+
+Who we spoke to / researched:
+
+- Health-conscious women exploring lab report clarity
+- Peer mentors and product advisors in women's wellness
+- Desk research on menstrual and reproductive health result interpretation
+
+Key findings:
+
+| Finding | Evidence | Product decision |
+|---|---|---|
+| Lab results feel overwhelming | User feedback and interview notes | Add plain-language summaries for each marker |
+| People want action steps | Observations from validation talks | Build a doctor question checklist feature |
+| Audio helps accessibility | Early testers asked for read-aloud support | Add TTS fallback and browser audio playback |
+
+## Tech Stack
+
+- Frontend: React, Vite, TypeScript, Tailwind CSS
+- Backend: Node.js, Express, TypeScript
+- Database: PostgreSQL with Prisma ORM
+- AI / API Tools: Google Gemini, Groq SDK, Cloudinary, YarnGPT TTS + browser speechSynthesis fallback
+- Deployment: Vercel (frontend), Render or equivalent backend hosting
+
+## Architecture
+
+```text
+[User Browser]
+  ↓
+[Frontend: React + Vite]
+  ↓
+[Backend: Express + Prisma]
+  ↓
+[PostgreSQL] / [Google Gemini] / [Groq] / [Cloudinary]
 ```
 
-### 3. Install dependencies
+## Installation / Setup
+
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL
+- API keys for Google Gemini, Groq, and Cloudinary
+
+### Clone the repository
+
+```bash
+git clone [repository-url]
+cd Lumina
+```
+
+### Install dependencies
 
 ```bash
 npm install
@@ -49,84 +109,100 @@ cd backend && npm install && cd ..
 cd frontend && npm install && cd ..
 ```
 
-### 4. Set up the database
+### Set up environment variables
 
-```bash
-cd backend
-npm run db:push      # push schema to your Postgres instance
-npm run db:generate  # generate Prisma client
+Create `.env` files in `backend/` and `frontend/` if required.
+
+Example backend variables:
+
+```env
+DATABASE_URL=
+CLOUDINARY_URL=
+GOOGLE_API_KEY=
+GROQ_API_KEY=
+FRONTEND_URL=https://lumina-frontend-one.vercel.app
 ```
 
-### 5. Run in development
+Example frontend variables:
 
-```bash
-# From the root — starts both backend (port 3001) and frontend (port 5173)
-npm run dev
+```env
+VITE_API_URL=https://<your-backend-domain>/api
 ```
 
-Then open: http://localhost:5173
+### Run locally
+
+```bash
+# Backend and frontend must run separately in this repo structure
+cd backend && npm run dev
+cd ../frontend && npm run dev
+```
+
+Open `http://localhost:5173` in your browser.
+
+## Usage
+
+1. Upload a lab report PDF or image.
+2. View the decoded health markers and trend charts.
+3. Listen to the audio summary and copy doctor questions.
 
 ## Project Structure
 
-```
-Lumina/
+```text
+.
 ├── backend/
 │   ├── prisma/
-│   │   └── schema.prisma       # User, Report, Marker models
 │   ├── src/
-│   │   ├── index.ts            # Express server entry
-│   │   ├── lib/prisma.ts       # Prisma singleton
-│   │   ├── middleware/upload.ts # Multer config
+│   │   ├── index.ts
+│   │   ├── lib/
+│   │   ├── middleware/
 │   │   ├── routes/
-│   │   │   ├── reports.ts      # Upload pipeline + CRUD
-│   │   │   ├── markers.ts      # Trend queries
-│   │   │   ├── users.ts        # Guest session management
-│   │   │   └── audio.ts        # TTS endpoint
 │   │   └── services/
-│   │       ├── gemini.ts       # Vision extraction
-│   │       ├── groq.ts         # Empathetic analysis
-│   │       ├── cloudinary.ts   # File storage
-│   │       └── yarngpt.ts      # TTS with fallback
 │   └── package.json
-│
 ├── frontend/
-│   ├── public/favicon.svg
+│   ├── public/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── FileUpload.tsx   # Drag & drop
-│   │   │   ├── MarkerCard.tsx   # Per-marker display with range bar
-│   │   │   ├── TrendChart.tsx   # Recharts line chart
-│   │   │   ├── AdvocacyChecklist.tsx
-│   │   │   └── AudioPlayer.tsx  # TTS with waveform animation
+│   │   ├── hooks/
+│   │   ├── lib/
 │   │   ├── pages/
-│   │   │   ├── Home.tsx         # Landing page
-│   │   │   ├── Upload.tsx       # Two-step upload form
-│   │   │   ├── Results.tsx      # Polling + full analysis display
-│   │   │   └── History.tsx      # Report list + trend chart tab
-│   │   ├── hooks/useSession.ts  # Guest session (localStorage)
-│   │   ├── lib/api.ts           # Typed axios client
-│   │   ├── types/index.ts       # Shared TypeScript types
-│   │   └── index.css            # Design system
+│   │   └── types/
 │   └── package.json
-│
-└── package.json                 # Monorepo root with workspaces
+└── README.md
 ```
 
-## Database Schema (simplified)
+## Challenges We Faced
 
-```
-User       → id, sessionId (UUID from localStorage)
-Report     → id, userId, fileUrl, cycleDay, cyclePhase, status, explanation, advocacyChecklist
-Marker     → id, reportId, name, displayName, value, unit, refLow, refHigh, status, plainExplanation, trendNote
-```
+- Extracting medical markers accurately from PDFs and report images
+- Making result explanations clear without oversimplifying health context
+- Ensuring audio narration works reliably with backend TTS and browser fallback
 
-## Deployment
+## What We Would Improve Next
 
-- **Frontend** → Vercel (set `VITE_API_URL` env var to your backend URL)
-- **Backend** → Render (set all env vars from `.env.example`)
+- Add more report formats and lab provider templates
+- Expand support for personalized cycle and hormone guidance
+- Add user accounts and secure saved history across devices
 
-## Disclaimer
+## Business / Sustainability Model
 
-Lumina is an educational tool. It does not provide medical diagnoses or treatment recommendations.
-Always discuss your lab results with a qualified healthcare professional.
+- Users/customers: women seeking better lab report clarity and health confidence
+- Revenue model: subscription or premium access to deeper explanation features
+- Key partners: clinics, telehealth providers, wellness coaches
+- Main costs: hosting, AI API usage, data privacy and support
+
+## Team Contributions
+
+| Name | Role | Contribution |
+|---|---|---|
+| Olumide Michelle Oluwanifemi | Developer | Frontend and backend implementation |
+| Adedunye Imisioluwa Praise | Web Developer | UI development and integration |
+| Ewelike Virginia Oluchi | Researcher | User research and health content validation |
+
+## Acknowledgements
+
+- NITHUB, University of Lagos
+- HER Hackathon mentors, facilitators, judges, and volunteers
+- Users and stakeholders who helped us validate the problem
+
+## License
+
+For hackathon/demo purposes only.
